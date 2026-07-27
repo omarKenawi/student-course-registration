@@ -19,7 +19,7 @@ public record UpdateCourseRequest(
         Integer creditHours,
 
         @Positive
-        Integer capacity,
+        Long capacity,
 
         Term term,
 

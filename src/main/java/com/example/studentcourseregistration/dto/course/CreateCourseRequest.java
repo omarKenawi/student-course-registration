@@ -25,7 +25,7 @@ public record CreateCourseRequest(
 
         @NotNull
         @Positive
-        Integer capacity,
+        Long capacity,
 
         @NotNull
         Term term,

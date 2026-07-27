@@ -14,9 +14,9 @@ public record CourseResponse(
 
         Integer creditHours,
 
-        Integer capacity,
+        Long capacity,
 
-        Integer remainingSeats,
+        Long remainingSeats,
 
         Term term,
 

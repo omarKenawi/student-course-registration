@@ -46,7 +46,7 @@ public class Course {
     private Integer creditHours;
 
     @Column(nullable = false)
-    private Integer capacity;
+    private Long capacity;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
