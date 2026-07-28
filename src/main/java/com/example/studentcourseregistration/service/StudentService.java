@@ -5,12 +5,14 @@ import com.example.studentcourseregistration.dto.student.StudentResponse;
 import com.example.studentcourseregistration.dto.student.UpdateStudentRequest;
 import com.example.studentcourseregistration.entity.Student;
 import com.example.studentcourseregistration.entity.User;
+import com.example.studentcourseregistration.enums.AuditAction;
 import com.example.studentcourseregistration.enums.Role;
 import com.example.studentcourseregistration.exception.ResourceAlreadyExistsException;
 import com.example.studentcourseregistration.exception.ResourceNotFoundException;
 import com.example.studentcourseregistration.mapper.StudentMapper;
 import com.example.studentcourseregistration.repository.StudentRepository;
 import com.example.studentcourseregistration.repository.UserRepository;
+import com.example.studentcourseregistration.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,8 @@ public class StudentService {
     private final UserRepository userRepository;
     private final StudentMapper studentMapper;
     private final PasswordEncoder passwordEncoder;
+    private final AuditLogService auditLogService;
+    private final SecurityUtils securityUtils;
 
     @Transactional
     public StudentResponse create(CreateStudentRequest request) {
@@ -53,6 +57,12 @@ public class StudentService {
                 .build();
 
         Student savedStudent = studentRepository.save(student);
+        auditLogService.log(
+                securityUtils.getCurrentUser(),
+                AuditAction.CREATE,
+                "Student",
+                savedStudent.getId()
+        );
         return studentMapper.toResponse(savedStudent);
     }
 
@@ -91,6 +101,12 @@ public class StudentService {
         }
 
         userRepository.save(user);
+        auditLogService.log(
+                securityUtils.getCurrentUser(),
+                AuditAction.UPDATE,
+                "Student",
+                student.getId()
+        );
         return studentMapper.toResponse(student);
     }
 

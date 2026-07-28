@@ -5,6 +5,7 @@ import com.example.studentcourseregistration.dto.course.CreateCourseRequest;
 import com.example.studentcourseregistration.dto.course.UpdateCourseRequest;
 import com.example.studentcourseregistration.entity.Course;
 import com.example.studentcourseregistration.entity.Instructor;
+import com.example.studentcourseregistration.enums.AuditAction;
 import com.example.studentcourseregistration.exception.ResourceAlreadyExistsException;
 import com.example.studentcourseregistration.exception.ResourceNotFoundException;
 import com.example.studentcourseregistration.mapper.CourseMapper;
@@ -12,6 +13,7 @@ import com.example.studentcourseregistration.repository.CourseEnrollmentCount;
 import com.example.studentcourseregistration.repository.CourseRepository;
 import com.example.studentcourseregistration.repository.EnrollmentRepository;
 import com.example.studentcourseregistration.repository.InstructorRepository;
+import com.example.studentcourseregistration.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,8 @@ public class CourseService {
     private final InstructorRepository instructorRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final CourseMapper courseMapper;
+    private final AuditLogService auditLogService;
+    private final SecurityUtils securityUtils;
 
     @Transactional
     public CourseResponse create(CreateCourseRequest request) {
@@ -53,6 +57,12 @@ public class CourseService {
                 .build();
 
         Course saved = courseRepository.save(course);
+        auditLogService.log(
+                securityUtils.getCurrentUser(),
+                AuditAction.CREATE,
+                "Course",
+                saved.getId()
+        );
         return courseMapper.toResponse(saved, 0L);
     }
 
@@ -78,6 +88,12 @@ public class CourseService {
         }
         Course saved = courseRepository.save(course);
         Long activeCount = enrollmentRepository.countActiveByCourseId(id);
+        auditLogService.log(
+                securityUtils.getCurrentUser(),
+                AuditAction.UPDATE,
+                "Course",
+                saved.getId()
+        );
         return courseMapper.toResponse(saved, activeCount);
     }
 

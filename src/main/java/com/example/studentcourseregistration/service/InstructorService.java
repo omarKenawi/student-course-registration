@@ -5,12 +5,14 @@ import com.example.studentcourseregistration.dto.instructor.InstructorResponse;
 import com.example.studentcourseregistration.dto.instructor.UpdateInstructorRequest;
 import com.example.studentcourseregistration.entity.Instructor;
 import com.example.studentcourseregistration.entity.User;
+import com.example.studentcourseregistration.enums.AuditAction;
 import com.example.studentcourseregistration.enums.Role;
 import com.example.studentcourseregistration.exception.ResourceAlreadyExistsException;
 import com.example.studentcourseregistration.exception.ResourceNotFoundException;
 import com.example.studentcourseregistration.mapper.InstructorMapper;
 import com.example.studentcourseregistration.repository.InstructorRepository;
 import com.example.studentcourseregistration.repository.UserRepository;
+import com.example.studentcourseregistration.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,9 @@ public class InstructorService {
     private final UserRepository userRepository;
     private final InstructorMapper instructorMapper;
     private final PasswordEncoder passwordEncoder;
+    private final AuditLogService auditLogService;
+    private final SecurityUtils securityUtils;
+
 
     @Transactional
     public InstructorResponse create(CreateInstructorRequest request) {
@@ -51,8 +56,14 @@ public class InstructorService {
                 .employeeNumber(request.employeeNumber())
                 .build();
 
-        Instructor savedInstructor = instructorRepository.save(instructor);
-        return instructorMapper.toResponse(savedInstructor);
+        Instructor saved = instructorRepository.save(instructor);
+        auditLogService.log(
+                securityUtils.getCurrentUser(),
+                AuditAction.CREATE,
+                "Instructor",
+                saved.getId()
+        );
+        return instructorMapper.toResponse(saved);
     }
 
     @Transactional(readOnly = true)
@@ -90,6 +101,13 @@ public class InstructorService {
         }
 
         userRepository.save(user);
+        auditLogService.log(
+                securityUtils.getCurrentUser(),
+                AuditAction.UPDATE,
+                "Instructor",
+                instructor.getId()
+        );
+
         return instructorMapper.toResponse(instructor);
     }
 

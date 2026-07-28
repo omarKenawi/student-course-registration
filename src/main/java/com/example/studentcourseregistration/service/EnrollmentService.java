@@ -5,6 +5,7 @@ import com.example.studentcourseregistration.dto.enrollment.RegisterRequest;
 import com.example.studentcourseregistration.entity.Course;
 import com.example.studentcourseregistration.entity.Enrollment;
 import com.example.studentcourseregistration.entity.Student;
+import com.example.studentcourseregistration.enums.AuditAction;
 import com.example.studentcourseregistration.enums.EnrollmentStatus;
 import com.example.studentcourseregistration.exception.BusinessRuleViolationException;
 import com.example.studentcourseregistration.exception.ResourceNotFoundException;
@@ -12,6 +13,7 @@ import com.example.studentcourseregistration.mapper.EnrollmentMapper;
 import com.example.studentcourseregistration.repository.CourseRepository;
 import com.example.studentcourseregistration.repository.EnrollmentRepository;
 import com.example.studentcourseregistration.repository.StudentRepository;
+import com.example.studentcourseregistration.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,8 @@ public class EnrollmentService {
     private final StudentRepository studentRepository;
     private final CourseRepository courseRepository;
     private final EnrollmentMapper enrollmentMapper;
+    private final AuditLogService auditLogService;
+    private final SecurityUtils securityUtils;
 
     @Transactional
     public EnrollmentResponse register(RegisterRequest request) {
@@ -63,12 +67,23 @@ public class EnrollmentService {
             enrollment.setStatus(EnrollmentStatus.ACTIVE);
             enrollment.setDroppedAt(null);
             enrollment.setEnrolledAt(Instant.now());
-
+            auditLogService.log(
+                    securityUtils.getCurrentUser(),
+                    AuditAction.REGISTER,
+                    "Enrollment",
+                    enrollment.getId()
+            );
             return enrollmentMapper.toResponse(enrollment);
         }
         Enrollment enrollment = Enrollment.builder().student(student).course(course).status(EnrollmentStatus.ACTIVE).enrolledAt(Instant.now()).build();
 
         Enrollment saved = enrollmentRepository.save(enrollment);
+        auditLogService.log(
+                securityUtils.getCurrentUser(),
+                AuditAction.REGISTER,
+                "Enrollment",
+                enrollment.getId()
+        );
 
         return enrollmentMapper.toResponse(saved);
 
@@ -90,7 +105,12 @@ public class EnrollmentService {
 
         enrollment.setStatus(EnrollmentStatus.DROPPED);
         enrollment.setDroppedAt(Instant.now());
-
+        auditLogService.log(
+                securityUtils.getCurrentUser(),
+                AuditAction.DROP,
+                "Enrollment",
+                enrollment.getId()
+        );
         return enrollmentMapper.toResponse(enrollment);
     }
 

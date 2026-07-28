@@ -3,10 +3,12 @@ package com.example.studentcourseregistration.service;
 import com.example.studentcourseregistration.dto.auth.CreateRegistrarRequest;
 import com.example.studentcourseregistration.dto.auth.UserResponse;
 import com.example.studentcourseregistration.entity.User;
+import com.example.studentcourseregistration.enums.AuditAction;
 import com.example.studentcourseregistration.enums.Role;
 import com.example.studentcourseregistration.exception.ResourceAlreadyExistsException;
 import com.example.studentcourseregistration.mapper.UserMapper;
 import com.example.studentcourseregistration.repository.UserRepository;
+import com.example.studentcourseregistration.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final AuditLogService auditLogService;
+    private final SecurityUtils securityUtils;
 
     @Transactional
     public UserResponse createRegistrar(CreateRegistrarRequest request) {
@@ -34,6 +38,12 @@ public class UserService {
                 .role(Role.REGISTRAR)
                 .build();
         userRepository.save(registrar);
+        auditLogService.log(
+                securityUtils.getCurrentUser(),
+                AuditAction.CREATE,
+                "User",
+                registrar.getId()
+        );
         return userMapper.toResponse(registrar);
     }
 }
