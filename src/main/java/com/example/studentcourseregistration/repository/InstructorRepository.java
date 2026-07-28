@@ -28,6 +28,7 @@ public interface InstructorRepository extends JpaRepository<Instructor, Long> {
                 JOIN FETCH i.user
             """)
     List<Instructor> findAllWithUser();
+    Optional<Instructor> findByUserId(Long userId);
 
 
 }

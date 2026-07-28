@@ -9,6 +9,7 @@ import com.example.studentcourseregistration.service.EnrolmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,11 +24,13 @@ public class CourseController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('ADMIN','REGISTRAR')")
     public CourseResponse create(@Valid @RequestBody CreateCourseRequest request) {
         return courseService.create(request);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','REGISTRAR')")
     public CourseResponse update(
             @PathVariable Long id,
             @Valid @RequestBody UpdateCourseRequest request) {
@@ -45,6 +48,8 @@ public class CourseController {
         return courseService.getAll();
     }
     @GetMapping("/{courseId}/roster")
+
+    @PreAuthorize("hasAnyRole('ADMIN','REGISTRAR','INSTRUCTOR')")
     public List<EnrollmentResponse> getCourseRoster(
             @PathVariable Long courseId) {
 

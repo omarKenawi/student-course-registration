@@ -1,4 +1,5 @@
 package com.example.studentcourseregistration.entity;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,6 +30,7 @@ public class Instructor {
             nullable = false,
             unique = true,
             foreignKey = @ForeignKey(name = "fk_instructor_user")
+
     )
     private User user;
 

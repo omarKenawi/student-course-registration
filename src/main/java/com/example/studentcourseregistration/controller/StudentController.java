@@ -9,6 +9,7 @@ import com.example.studentcourseregistration.service.StudentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class StudentController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public StudentResponse create(
             @Valid @RequestBody CreateStudentRequest request) {
 
@@ -41,13 +43,21 @@ public class StudentController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public StudentResponse update(
             @PathVariable Long id,
             @Valid @RequestBody UpdateStudentRequest request) {
 
         return studentService.update(id, request);
     }
+
     @GetMapping("/{studentId}/schedule")
+    @PreAuthorize("""
+            hasRole('ADMIN')
+            or hasRole('REGISTRAR')
+            or @authorizationService.canAccessStudent(#studentId, authentication)
+            """)
+
     public List<EnrollmentResponse> getCurrentSchedule(
             @PathVariable Long studentId) {
 

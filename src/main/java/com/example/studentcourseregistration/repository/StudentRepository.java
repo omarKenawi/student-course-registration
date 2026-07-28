@@ -28,4 +28,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
                 WHERE s.id = :id
             """)
     Optional<Student> findByIdWithUser(Long id);
+
+    Optional<Student> findByUserId(Long userId);
 }

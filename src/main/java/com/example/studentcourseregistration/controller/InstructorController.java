@@ -7,6 +7,7 @@ import com.example.studentcourseregistration.service.InstructorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class InstructorController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public InstructorResponse create(
             @Valid @RequestBody CreateInstructorRequest request) {
 
@@ -37,6 +39,7 @@ public class InstructorController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public InstructorResponse update(
             @PathVariable Long id,
             @Valid @RequestBody UpdateInstructorRequest request) {
