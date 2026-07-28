@@ -5,7 +5,7 @@ import com.example.studentcourseregistration.dto.course.CreateCourseRequest;
 import com.example.studentcourseregistration.dto.course.UpdateCourseRequest;
 import com.example.studentcourseregistration.dto.enrollment.EnrollmentResponse;
 import com.example.studentcourseregistration.service.CourseService;
-import com.example.studentcourseregistration.service.EnrolmentService;
+import com.example.studentcourseregistration.service.EnrollmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,7 @@ import java.util.List;
 public class CourseController {
 
     private final CourseService courseService;
-    private final EnrolmentService enrolmentService;
+    private final EnrollmentService enrollmentService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -47,12 +47,15 @@ public class CourseController {
     public List<CourseResponse> getAll() {
         return courseService.getAll();
     }
-    @GetMapping("/{courseId}/roster")
 
-    @PreAuthorize("hasAnyRole('ADMIN','REGISTRAR','INSTRUCTOR')")
+    @GetMapping("/{courseId}/roster")
+    @PreAuthorize("""
+                hasAnyRole('ADMIN','REGISTRAR')
+                or @authorizationService.canAccessCourseRoster(#courseId, authentication)
+            """)
     public List<EnrollmentResponse> getCourseRoster(
             @PathVariable Long courseId) {
 
-        return enrolmentService.getCourseRoster(courseId);
+        return enrollmentService.getCourseRoster(courseId);
     }
 }

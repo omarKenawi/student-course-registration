@@ -29,11 +29,13 @@ public class InstructorController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','REGISTRAR','INSTRUCTOR')")
     public InstructorResponse getById(@PathVariable Long id) {
         return instructorService.getById(id);
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','REGISTRAR','INSTRUCTOR')")
     public List<InstructorResponse> getAll() {
         return instructorService.getAll();
     }

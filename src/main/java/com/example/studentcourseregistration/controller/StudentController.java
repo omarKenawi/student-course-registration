@@ -4,7 +4,7 @@ import com.example.studentcourseregistration.dto.enrollment.EnrollmentResponse;
 import com.example.studentcourseregistration.dto.student.CreateStudentRequest;
 import com.example.studentcourseregistration.dto.student.StudentResponse;
 import com.example.studentcourseregistration.dto.student.UpdateStudentRequest;
-import com.example.studentcourseregistration.service.EnrolmentService;
+import com.example.studentcourseregistration.service.EnrollmentService;
 import com.example.studentcourseregistration.service.StudentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import java.util.List;
 public class StudentController {
 
     private final StudentService studentService;
-    private final EnrolmentService enrollmentService;
+    private final EnrollmentService enrollmentService;
 
 
     @PostMapping
@@ -33,11 +33,16 @@ public class StudentController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("""
+    hasAnyRole('ADMIN','REGISTRAR','INSTRUCTOR')
+    or @authorizationService.canAccessStudent(#id, authentication)
+""")
     public StudentResponse getById(@PathVariable Long id) {
         return studentService.getById(id);
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','REGISTRAR','INSTRUCTOR')")
     public List<StudentResponse> getAll() {
         return studentService.getAll();
     }
@@ -57,7 +62,6 @@ public class StudentController {
             or hasRole('REGISTRAR')
             or @authorizationService.canAccessStudent(#studentId, authentication)
             """)
-
     public List<EnrollmentResponse> getCurrentSchedule(
             @PathVariable Long studentId) {
 

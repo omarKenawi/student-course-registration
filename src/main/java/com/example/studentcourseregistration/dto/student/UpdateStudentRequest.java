@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 
 public record UpdateStudentRequest(
 
+        @NotBlank
         @Size(max = 100)
         String fullName,
 

@@ -2,7 +2,7 @@ package com.example.studentcourseregistration.controller;
 
 import com.example.studentcourseregistration.dto.enrollment.EnrollmentResponse;
 import com.example.studentcourseregistration.dto.enrollment.RegisterRequest;
-import com.example.studentcourseregistration.service.EnrolmentService;
+import com.example.studentcourseregistration.service.EnrollmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,21 +15,27 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class EnrollmentController {
 
-    private final EnrolmentService enrolmentService;
+    private final EnrollmentService enrollmentService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAnyRole('ADMIN','STUDENT','REGISTRAR')")
+    @PreAuthorize("""
+                hasAnyRole('ADMIN','REGISTRAR')
+                or @authorizationService.canAccessStudent(#request.studentId(), authentication)
+            """)
     public EnrollmentResponse register(
             @Valid @RequestBody RegisterRequest request) {
 
-        return enrolmentService.register(request);
+        return enrollmentService.register(request);
     }
 
     @PatchMapping("/{id}/drop")
-    @PreAuthorize("hasAnyRole('ADMIN','STUDENT','REGISTRAR')")
+    @PreAuthorize("""
+                hasAnyRole('ADMIN','REGISTRAR')
+                or @authorizationService.canAccessEnrollment(#id, authentication)
+            """)
     public EnrollmentResponse drop(@PathVariable Long id) {
-        return enrolmentService.drop(id);
+        return enrollmentService.drop(id);
     }
 
 
