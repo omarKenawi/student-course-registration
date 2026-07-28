@@ -1,5 +1,6 @@
 package com.example.studentcourseregistration.dto.course;
 
+import com.example.studentcourseregistration.enums.AcademicLevel;
 import com.example.studentcourseregistration.enums.Term;
 
 public record CourseResponse(
@@ -21,6 +22,8 @@ public record CourseResponse(
         Term term,
 
         Integer academicYear,
+
+        AcademicLevel academicLevel,
 
         Long instructorId,
 

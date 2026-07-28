@@ -2,6 +2,7 @@ package com.example.studentcourseregistration.entity;
 
 import java.time.Instant;
 
+import com.example.studentcourseregistration.enums.AcademicLevel;
 import com.example.studentcourseregistration.enums.Term;
 import jakarta.persistence.*;
 import lombok.*;
@@ -51,6 +52,10 @@ public class Course {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Term term;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AcademicLevel academicLevel;
 
     @Column(nullable = false)
     private Integer academicYear;

@@ -26,6 +26,7 @@ public class CourseMapper {
                 remainingSeats,
                 course.getTerm(),
                 course.getAcademicYear(),
+                course.getAcademicLevel(),
                 course.getInstructor().getId(),
                 course.getInstructor().getUser().getFullName()
         );

@@ -32,7 +32,7 @@ public class CourseService {
     @Transactional
     public CourseResponse create(CreateCourseRequest request) {
         Instructor instructor = instructorRepository.findById(request.instructorId())
-                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Instructor not found"));
         if (courseRepository.existsByCodeAndTermAndAcademicYear(
                 request.code(),
                 request.term(),
@@ -48,6 +48,7 @@ public class CourseService {
                 .capacity(request.capacity())
                 .term(request.term())
                 .academicYear(request.academicYear())
+                .academicLevel(request.academicLevel())
                 .instructor(instructor)
                 .build();
 
@@ -66,9 +67,10 @@ public class CourseService {
         if (request.creditHours() != null) course.setCreditHours(request.creditHours());
         if (request.capacity() != null) course.setCapacity(request.capacity());
         if (request.term() != null) course.setTerm(request.term());
+        if (request.academicLevel() != null) course.setAcademicLevel(request.academicLevel());
         if (request.academicYear() != null) course.setAcademicYear(request.academicYear());
         if (request.instructorId() != null) {
-            Instructor instructor = instructorRepository.findById(request.instructorId()).orElseThrow(() -> new ResourceNotFoundException("Course not found"));
+            Instructor instructor = instructorRepository.findById(request.instructorId()).orElseThrow(() -> new ResourceNotFoundException("instructor not found"));
             course.setInstructor(instructor);
         }
         if (courseRepository.existsByCodeAndTermAndAcademicYearAndIdNot(course.getCode(),course.getTerm(), course.getAcademicYear(), id)) {
@@ -77,12 +79,6 @@ public class CourseService {
         Course saved = courseRepository.save(course);
         Long activeCount = enrollmentRepository.countActiveByCourseId(id);
         return courseMapper.toResponse(saved, activeCount);
-    }
-
-    @Transactional
-    public void delete(Long id) {
-        Course course = courseRepository.findById(id).orElseThrow(() -> new  ResourceNotFoundException("Course not found"));
-        courseRepository.delete(course);
     }
 
     @Transactional(readOnly = true)
@@ -103,7 +99,7 @@ public class CourseService {
                         CourseEnrollmentCount::getActiveCount
                 ));
 
-        return courseRepository.findAll()
+        return courseRepository.findAllWithInstructorAndUser()
                 .stream()
                 .map(course -> courseMapper.toResponse(
                         course,

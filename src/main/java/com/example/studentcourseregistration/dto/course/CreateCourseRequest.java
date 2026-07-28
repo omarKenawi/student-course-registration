@@ -1,5 +1,6 @@
 package com.example.studentcourseregistration.dto.course;
 
+import com.example.studentcourseregistration.enums.AcademicLevel;
 import com.example.studentcourseregistration.enums.Term;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -33,6 +34,9 @@ public record CreateCourseRequest(
         @NotNull
         @Positive
         Integer academicYear,
+
+        @NotNull
+        AcademicLevel academicLevel,
 
         @NotNull
         Long instructorId
