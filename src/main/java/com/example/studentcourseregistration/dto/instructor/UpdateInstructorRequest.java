@@ -7,11 +7,12 @@ import jakarta.validation.constraints.Size;
 public record UpdateInstructorRequest(
 
         @Size(max = 100)
+        @NotBlank
         String fullName,
 
-        @NotBlank
         @Email
         @Size(max = 100)
+        @NotBlank
         String email
 
 ) {
