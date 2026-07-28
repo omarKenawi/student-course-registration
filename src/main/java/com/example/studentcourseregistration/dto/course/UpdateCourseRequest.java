@@ -1,5 +1,6 @@
 package com.example.studentcourseregistration.dto.course;
 
+import com.example.studentcourseregistration.enums.AcademicLevel;
 import com.example.studentcourseregistration.enums.Term;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
@@ -25,6 +26,8 @@ public record UpdateCourseRequest(
 
         @Positive
         Integer academicYear,
+
+        AcademicLevel academicLevel,
 
         Long instructorId
 ) {
