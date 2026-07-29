@@ -18,7 +18,7 @@ A student course registration backend built with **Java, Spring Boot, and Postgr
 
 The app is fully seeded on startup (`data.sql`) — no manual setup needed to try it out. Everyone shares the same password below.
 
-**Password (all accounts):** `<password>`
+**Password (all accounts):** `password`
 
 | Role | Count | Emails |
 |---|---|---|
