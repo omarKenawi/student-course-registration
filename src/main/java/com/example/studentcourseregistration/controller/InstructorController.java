@@ -3,6 +3,7 @@ package com.example.studentcourseregistration.controller;
 import com.example.studentcourseregistration.dto.instructor.CreateInstructorRequest;
 import com.example.studentcourseregistration.dto.instructor.InstructorResponse;
 import com.example.studentcourseregistration.dto.instructor.UpdateInstructorRequest;
+import com.example.studentcourseregistration.security.SecurityUtils;
 import com.example.studentcourseregistration.service.InstructorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,13 @@ import java.util.List;
 public class InstructorController {
 
     private final InstructorService instructorService;
+    private final SecurityUtils securityUtils;
+
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('INSTRUCTOR')")
+    public InstructorResponse getCurrentInstructor() {
+        return instructorService.getByUserId(securityUtils.getCurrentUser().getId());
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

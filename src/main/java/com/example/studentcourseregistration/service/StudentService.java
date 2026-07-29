@@ -68,6 +68,13 @@ public class StudentService {
     }
 
     @Transactional(readOnly = true)
+    public StudentResponse getByUserId(Long userId) {
+        Student student = studentRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found for user id: " + userId));
+        return studentMapper.toResponse(student);
+    }
+
+    @Transactional(readOnly = true)
     public StudentResponse getById(Long id) {
         Student student = studentRepository.findByIdWithUser(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: "+id));

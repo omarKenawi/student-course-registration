@@ -69,6 +69,13 @@ public class InstructorService {
     }
 
     @Transactional(readOnly = true)
+    public InstructorResponse getByUserId(Long userId) {
+        Instructor instructor = instructorRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Instructor not found for user id: " + userId));
+        return instructorMapper.toResponse(instructor);
+    }
+
+    @Transactional(readOnly = true)
     public InstructorResponse getById(Long id) {
         Instructor instructor = instructorRepository.findByIdWithUser(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Instructor not found with id: "+id));

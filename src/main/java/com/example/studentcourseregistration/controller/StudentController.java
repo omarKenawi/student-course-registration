@@ -1,5 +1,6 @@
 package com.example.studentcourseregistration.controller;
 
+import com.example.studentcourseregistration.security.SecurityUtils;
 import com.example.studentcourseregistration.dto.enrollment.EnrollmentResponse;
 import com.example.studentcourseregistration.dto.student.CreateStudentRequest;
 import com.example.studentcourseregistration.dto.student.StudentResponse;
@@ -21,7 +22,21 @@ public class StudentController {
 
     private final StudentService studentService;
     private final EnrollmentService enrollmentService;
+    private final SecurityUtils securityUtils;
 
+
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('STUDENT')")
+    public StudentResponse getCurrentStudent() {
+        return studentService.getByUserId(securityUtils.getCurrentUser().getId());
+    }
+
+    @GetMapping("/me/schedule")
+    @PreAuthorize("hasRole('STUDENT')")
+    public List<EnrollmentResponse> getCurrentSchedule() {
+        StudentResponse student = studentService.getByUserId(securityUtils.getCurrentUser().getId());
+        return enrollmentService.getCurrentSchedule(student.id());
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
