@@ -6,6 +6,7 @@ import com.example.studentcourseregistration.dto.course.UpdateCourseRequest;
 import com.example.studentcourseregistration.entity.Course;
 import com.example.studentcourseregistration.entity.Instructor;
 import com.example.studentcourseregistration.enums.AuditAction;
+import com.example.studentcourseregistration.exception.BusinessRuleViolationException;
 import com.example.studentcourseregistration.exception.ResourceAlreadyExistsException;
 import com.example.studentcourseregistration.exception.ResourceNotFoundException;
 import com.example.studentcourseregistration.mapper.CourseMapper;
@@ -15,6 +16,7 @@ import com.example.studentcourseregistration.repository.EnrollmentRepository;
 import com.example.studentcourseregistration.repository.InstructorRepository;
 import com.example.studentcourseregistration.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,14 +70,27 @@ public class CourseService {
 
     @Transactional
     public CourseResponse update(Long id, UpdateCourseRequest request) {
-        Course course = courseRepository.findById(id)
+        Course course = courseRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         if (request.code() != null) course.setCode(request.code());
         if (request.title() != null) course.setTitle(request.title());
         if (request.description() != null) course.setDescription(request.description());
         if (request.creditHours() != null) course.setCreditHours(request.creditHours());
-        if (request.capacity() != null) course.setCapacity(request.capacity());
+
+        if (request.capacity() != null) {
+
+            long activeEnrollments =
+                    enrollmentRepository.countActiveByCourseId(course.getId());
+
+            if (request.capacity() < activeEnrollments) {
+                throw new BusinessRuleViolationException(
+                        "Course capacity cannot be less than the number of enrolled students."
+                );
+            }
+
+            course.setCapacity(request.capacity());
+        }
         if (request.term() != null) course.setTerm(request.term());
         if (request.academicLevel() != null) course.setAcademicLevel(request.academicLevel());
         if (request.academicYear() != null) course.setAcademicYear(request.academicYear());
