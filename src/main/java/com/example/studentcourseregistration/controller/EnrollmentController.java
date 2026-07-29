@@ -21,7 +21,7 @@ public class EnrollmentController {
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("""
                 hasAnyRole('ADMIN','REGISTRAR')
-                or @authorizationService.canAccessStudent(#request.studentId(), authentication)
+                or @authorizationService.canAccessStudent(#request.studentId())
             """)
     public EnrollmentResponse register(
             @Valid @RequestBody RegisterRequest request) {
@@ -32,7 +32,7 @@ public class EnrollmentController {
     @PatchMapping("/{id}/drop")
     @PreAuthorize("""
                 hasAnyRole('ADMIN','REGISTRAR')
-                or @authorizationService.canAccessEnrollment(#id, authentication)
+                or @authorizationService.canAccessEnrollment(#id)
             """)
     public EnrollmentResponse drop(@PathVariable Long id) {
         return enrollmentService.drop(id);

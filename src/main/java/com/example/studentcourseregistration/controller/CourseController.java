@@ -51,7 +51,7 @@ public class CourseController {
     @GetMapping("/{courseId}/roster")
     @PreAuthorize("""
                 hasAnyRole('ADMIN','REGISTRAR')
-                or @authorizationService.canAccessCourseRoster(#courseId, authentication)
+                or @authorizationService.canAccessCourseRoster(#courseId)
             """)
     public List<EnrollmentResponse> getCourseRoster(
             @PathVariable Long courseId) {

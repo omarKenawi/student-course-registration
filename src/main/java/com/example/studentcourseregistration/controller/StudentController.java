@@ -35,7 +35,7 @@ public class StudentController {
     @GetMapping("/{id}")
     @PreAuthorize("""
     hasAnyRole('ADMIN','REGISTRAR','INSTRUCTOR')
-    or @authorizationService.canAccessStudent(#id, authentication)
+    or @authorizationService.canAccessStudent(#id)
 """)
     public StudentResponse getById(@PathVariable Long id) {
         return studentService.getById(id);
@@ -60,7 +60,7 @@ public class StudentController {
     @PreAuthorize("""
             hasRole('ADMIN')
             or hasRole('REGISTRAR')
-            or @authorizationService.canAccessStudent(#studentId, authentication)
+            or @authorizationService.canAccessStudent(#studentId)
             """)
     public List<EnrollmentResponse> getCurrentSchedule(
             @PathVariable Long studentId) {

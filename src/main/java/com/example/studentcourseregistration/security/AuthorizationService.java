@@ -7,7 +7,6 @@ import com.example.studentcourseregistration.repository.EnrollmentRepository;
 import com.example.studentcourseregistration.repository.InstructorRepository;
 import com.example.studentcourseregistration.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,16 +17,12 @@ public class AuthorizationService {
     private final InstructorRepository instructorRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final CourseRepository courseRepository;
+    private final SecurityUtils securityUtils;
 
 
-    public boolean canAccessStudent(
-            Long studentId,
-            Authentication authentication) {
+    public boolean canAccessStudent(Long studentId) {
 
-        CustomUserDetails principal =
-                (CustomUserDetails) authentication.getPrincipal();
-
-        User user = principal.getUser();
+        User user = securityUtils.getCurrentUser();
 
         if (user.getRole() == Role.ADMIN
                 || user.getRole() == Role.REGISTRAR) {
@@ -41,15 +36,9 @@ public class AuthorizationService {
                 && student.getId().equals(studentId);
     }
 
-    public boolean canAccessCourseRoster(
-            Long courseId,
-            Authentication authentication) {
+    public boolean canAccessCourseRoster(Long courseId) {
 
-        CustomUserDetails principal =
-                (CustomUserDetails) authentication.getPrincipal();
-
-        User user = principal.getUser();
-
+        User user = securityUtils.getCurrentUser();
         if (user.getRole() == Role.ADMIN
                 || user.getRole() == Role.REGISTRAR) {
             return true;
@@ -67,14 +56,9 @@ public class AuthorizationService {
     }
 
     public boolean canAccessEnrollment(
-            Long enrollmentId,
-            Authentication authentication) {
+            Long enrollmentId) {
 
-        CustomUserDetails principal =
-                (CustomUserDetails) authentication.getPrincipal();
-
-        User user = principal.getUser();
-
+        User user = securityUtils.getCurrentUser();
         if (user.getRole() == Role.ADMIN
                 || user.getRole() == Role.REGISTRAR) {
             return true;
