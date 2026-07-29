@@ -7,6 +7,7 @@ import com.example.studentcourseregistration.entity.Student;
 import com.example.studentcourseregistration.entity.User;
 import com.example.studentcourseregistration.enums.AuditAction;
 import com.example.studentcourseregistration.enums.Role;
+import com.example.studentcourseregistration.exception.BusinessRuleViolationException;
 import com.example.studentcourseregistration.exception.ResourceAlreadyExistsException;
 import com.example.studentcourseregistration.exception.ResourceNotFoundException;
 import com.example.studentcourseregistration.mapper.StudentMapper;
@@ -89,6 +90,9 @@ public class StudentService {
         User user = student.getUser();
 
         if (request.fullName() != null) {
+            if(request.fullName().isBlank()){
+                throw new BusinessRuleViolationException("name can not be empty");
+            }
             user.setFullName(request.fullName());
         }
 

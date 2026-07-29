@@ -7,6 +7,7 @@ import com.example.studentcourseregistration.entity.Instructor;
 import com.example.studentcourseregistration.entity.User;
 import com.example.studentcourseregistration.enums.AuditAction;
 import com.example.studentcourseregistration.enums.Role;
+import com.example.studentcourseregistration.exception.BusinessRuleViolationException;
 import com.example.studentcourseregistration.exception.ResourceAlreadyExistsException;
 import com.example.studentcourseregistration.exception.ResourceNotFoundException;
 import com.example.studentcourseregistration.mapper.InstructorMapper;
@@ -14,6 +15,7 @@ import com.example.studentcourseregistration.repository.InstructorRepository;
 import com.example.studentcourseregistration.repository.UserRepository;
 import com.example.studentcourseregistration.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,6 +91,9 @@ public class InstructorService {
         User user = instructor.getUser();
 
         if (request.fullName() != null) {
+            if(request.fullName().isBlank()){
+                throw new BusinessRuleViolationException("name can not be empty");
+            }
             user.setFullName(request.fullName());
         }
 
